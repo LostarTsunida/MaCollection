@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 import jwt
+import os
+from dotenv import load_dotenv
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -12,8 +14,7 @@ def get_password_hash(password):
 
 
 # --- JWT ---
-
-SECRET_KEY = "123456"  
+SECRET_KEY = os.getenv("SECRET_KEY") 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
