@@ -1,23 +1,64 @@
-from datetime import timedelta
+from datetime import timedelta 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
+from pydantic import BaseModel, EmailStr
 from sqlmodel import Session, select
 import jwt
 
 from api.database import get_session 
-from api.models import User          
+from api.models import User           
 from api.security import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
     verify_password,
+    get_password_hash,
     SECRET_KEY,
     ALGORITHM,
 )
+
+#--------------------------------------------------------------------------------
 
 router = APIRouter(prefix="/auth", tags=["Authentification"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
+class UserRegister(BaseModel):
+    email: EmailStr
+    password: str
+
+#--------------------------------------------------------------------------------
+
+@router.post("/register", status_code=status.HTTP_201_CREATED)
+def register(
+    user_data: UserRegister,
+    session: Session = Depends(get_session)
+):
+    statement = select(User).where(User.email == user_data.email)
+    existing_user = session.exec(statement).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cet email est déjà pris."
+        )
+
+    hashed_password = get_password_hash(user_data.password)
+
+    new_user = User(
+        email=user_data.email,
+        hashed_password=hashed_password
+    )
+
+    session.add(new_user)
+    session.commit()
+    session.refresh(new_user)
+
+    return {
+        "id": new_user.id,
+        "email": new_user.email
+    }
+
+#--------------------------------------------------------------------------------
 
 @router.post("/login")
 def login(
@@ -41,6 +82,7 @@ def login(
 
     return {"access_token": access_token, "token_type": "bearer"}
 
+#--------------------------------------------------------------------------------
 
 def get_current_user(
     token: str = Depends(oauth2_scheme), 
@@ -53,7 +95,6 @@ def get_current_user(
     )
     
     try:
-
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
@@ -61,7 +102,6 @@ def get_current_user(
     except jwt.PyJWTError:
         raise credentials_exception
         
-
     statement = select(User).where(User.username == username)
     user = session.exec(statement).first()
     
@@ -70,6 +110,7 @@ def get_current_user(
         
     return user
 
+#--------------------------------------------------------------------------------
 
 @router.get("/me")
 def read_users_me(current_user: User = Depends(get_current_user)):
