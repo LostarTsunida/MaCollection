@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 from api.database import get_session
 from api.models import User, Entry  
-from api.security import get_current_user 
+from api.core.security import get_current_user 
 
 
 router = APIRouter(tags=["Statistiques & Profil"])
