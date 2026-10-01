@@ -1,1 +1,12 @@
 .env
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.db
+node_modules/
+dist/
+
+# fichiers locaux qui ne font pas partie du rendu
+lancer.bat
+web/public/images/chefs/*.jpg
