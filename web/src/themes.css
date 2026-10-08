@@ -1,0 +1,395 @@
+/* ---------- Thèmes par région ----------
+   Chaque classe .theme-xxx redéfinit les mêmes variables.
+   La mise en page ne change pas, seules les couleurs, la police des titres et le motif changent. */
+
+.theme-italienne {
+  --r-primaire: #c65d3b;
+  --r-secondaire: #5e7d4e;
+  --r-accent: #e3a857;
+  --r-fond: #f6efe3;
+  --r-police: "Playfair Display", Georgia, serif;
+  --r-motif: url("/images/regions/italienne-motif.svg");
+}
+
+.theme-francaise {
+  --r-primaire: #2e4a6b;
+  --r-secondaire: #8c2f39;
+  --r-accent: #c9a45c;
+  --r-fond: #f7f3ec;
+  --r-police: "Cormorant Garamond", Georgia, serif;
+  --r-motif: url("/images/regions/francaise-motif.svg");
+}
+
+.theme-espagnole {
+  --r-primaire: #c0392b;
+  --r-secondaire: #1f5f99;
+  --r-accent: #f2b134;
+  --r-fond: #fbf7f0;
+  --r-police: "Abril Fatface", Georgia, serif;
+  --r-motif: url("/images/regions/espagnole-motif.svg");
+}
+
+.theme-chinoise {
+  --r-primaire: #b22222;
+  --r-secondaire: #2e8b57;
+  --r-accent: #d4a017;
+  --r-fond: #f5efe0;
+  --r-police: "Noto Serif SC", Georgia, serif;
+  --r-motif: url("/images/regions/chinoise-motif.svg");
+}
+
+.theme-japonaise {
+  --r-primaire: #26405f;
+  --r-secondaire: #c8102e;
+  --r-accent: #f4c7cf;
+  --r-fond: #faf7f2;
+  --r-police: "Shippori Mincho", Georgia, serif;
+  --r-motif: url("/images/regions/japonaise-motif.svg");
+}
+
+.theme-indienne {
+  --r-primaire: #b0306a;
+  --r-secondaire: #1b8a8c;
+  --r-accent: #e07a1f;
+  --r-fond: #fbf4e8;
+  --r-police: "Rozha One", Georgia, serif;
+  --r-motif: url("/images/regions/indienne-motif.svg");
+}
+
+.theme-mexicaine {
+  --r-primaire: #e4007c;
+  --r-secondaire: #00a6a6;
+  --r-accent: #f4c430;
+  --r-fond: #fff8e6;
+  --r-police: "Lilita One", Arial, sans-serif;
+  --r-motif: url("/images/regions/mexicaine-motif.svg");
+}
+
+.theme-marocaine {
+  --r-primaire: #2c4fa3;
+  --r-secondaire: #b5532c;
+  --r-accent: #c9a227;
+  --r-fond: #f6eddc;
+  --r-police: "Amiri", Georgia, serif;
+  --r-motif: url("/images/regions/marocaine-motif.svg");
+}
+
+.theme-americaine {
+  --r-primaire: #b22234;
+  --r-secondaire: #3c3b6e;
+  --r-accent: #f2b134;
+  --r-fond: #f7f3ec;
+  --r-police: "Alfa Slab One", Georgia, serif;
+  --r-motif: url("/images/regions/americaine-motif.svg");
+}
+
+/* en mode sombre on garde les couleurs de la région pour les accents
+   mais le fond reste sombre pour la lisibilité */
+[data-theme="sombre"] [class*="theme-"] {
+  --r-fond: var(--surface);
+}
+
+/* ---------- Utilisation des variables ---------- */
+
+/* cartes du catalogue */
+.carte[class*="theme-"] {
+  border-top: 5px solid var(--r-primaire);
+}
+
+.carte[class*="theme-"] .carte-region {
+  color: var(--r-primaire);
+}
+
+.carte[class*="theme-"] h3 {
+  font-family: var(--r-police);
+}
+
+/* puces de filtre : chaque région a sa couleur */
+.puce {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.puce[class*="theme-"] {
+  border: 2px solid var(--r-primaire);
+  color: var(--r-primaire);
+  background: color-mix(in srgb, var(--r-primaire) 8%, var(--surface));
+  font-weight: 600;
+}
+
+.puce[class*="theme-"]:hover {
+  background: color-mix(in srgb, var(--r-primaire) 18%, var(--surface));
+}
+
+.puce[class*="theme-"].active {
+  background: var(--r-primaire);
+  border-color: var(--r-primaire);
+  color: #fff;
+}
+
+[data-theme="sombre"] .puce[class*="theme-"]:not(.active) {
+  color: var(--texte);
+}
+
+/* petits drapeaux SVG */
+.drapeau {
+  vertical-align: -2px;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+/* entrées de la collection */
+.entree[class*="theme-"] {
+  border-left: 5px solid var(--r-primaire);
+}
+
+/* bandeau de région */
+.banniere {
+  position: relative;
+  border-radius: var(--rayon);
+  overflow: hidden;
+  margin: 0.5rem 0 1rem;
+  height: clamp(120px, 25vw, 280px);
+  background: var(--r-fond);
+}
+
+.banniere img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.banniere-texte {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.85);
+  color: #222;
+  border-left: 5px solid var(--r-primaire);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  max-width: 60%;
+}
+
+.banniere-texte h2 {
+  font-family: var(--r-police);
+  color: var(--r-primaire);
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.banniere-texte p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* page d'une recette */
+.fiche[class*="theme-"] {
+  background: var(--r-fond);
+  border-radius: var(--rayon);
+  padding: 1rem;
+  position: relative;
+  isolation: isolate;
+}
+
+.fiche[class*="theme-"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: var(--r-motif);
+  background-size: 80px;
+  opacity: 0.07;
+  border-radius: var(--rayon);
+  z-index: -1;
+}
+
+.fiche[class*="theme-"] h1,
+.fiche[class*="theme-"] h2 {
+  font-family: var(--r-police);
+  color: var(--r-primaire);
+}
+
+[data-theme="sombre"] .fiche[class*="theme-"] h1,
+[data-theme="sombre"] .fiche[class*="theme-"] h2 {
+  color: var(--r-accent);
+}
+
+.fiche[class*="theme-"] .carte-region {
+  color: var(--r-secondaire);
+}
+
+.fiche[class*="theme-"] .bouton {
+  background: var(--r-primaire);
+}
+
+.fiche[class*="theme-"] .bouton-secondaire {
+  background: transparent;
+  color: var(--texte);
+  border-color: var(--r-primaire);
+}
+
+/* ---------- Contenu de la fiche recette ---------- */
+.temps {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.temps div {
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 3px solid var(--r-accent, var(--accent));
+}
+
+.temps strong {
+  display: block;
+  font-size: 1.1rem;
+}
+
+.temps span {
+  font-size: 0.8rem;
+  color: var(--texte-discret);
+}
+
+.fiche-colonnes {
+  display: grid;
+  gap: 1rem;
+}
+
+.liste-ingredients {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.liste-ingredients li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px dashed var(--bordure);
+}
+
+.liste-ingredients .quantite {
+  font-weight: 700;
+  min-width: 95px;
+  color: var(--r-primaire, var(--accent));
+}
+
+[data-theme="sombre"] .liste-ingredients .quantite {
+  color: var(--r-accent, var(--accent));
+}
+
+.etapes {
+  counter-reset: etape;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.etapes li {
+  counter-increment: etape;
+  position: relative;
+  padding: 0 0 0.9rem 2.6rem;
+}
+
+.etapes li::before {
+  content: counter(etape);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--r-primaire, var(--accent));
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.puces-ustensiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  list-style: none;
+  margin: 0;
+}
+
+.puces-ustensiles li {
+  background: var(--surface);
+  border: 1px solid var(--bordure);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+}
+
+.conseils h3 {
+  font-size: 1rem;
+  margin: 0.75rem 0 0.25rem;
+}
+
+.conseils ul {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+@media (min-width: 640px) {
+  .temps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (min-width: 900px) {
+  .fiche-colonnes {
+    grid-template-columns: 1fr 2fr;
+    align-items: start;
+  }
+
+  .banniere-texte h2 {
+    font-size: 2rem;
+  }
+}
+
+/* hero aux couleurs de la région choisie */
+.hero[class*="theme-"] {
+  background:
+    radial-gradient(circle at 12% 18%, var(--r-accent) 0, transparent 40%),
+    linear-gradient(135deg, var(--r-primaire) 0%, var(--r-secondaire) 100%);
+}
+
+/* les deux chefs de chaque côté de la barre de recherche */
+.hero-chef {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .hero {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr) 220px;
+    align-items: end;
+    gap: 1rem;
+    padding-bottom: 0;
+  }
+
+  .hero-contenu {
+    align-self: center;
+    padding: 1rem 0 2rem;
+  }
+
+  .hero-chef {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.25));
+  }
+}
