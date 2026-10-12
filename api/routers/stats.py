@@ -1,26 +1,35 @@
 from fastapi import APIRouter, Depends
-from sqlmodel import Session, select
-from api.database import get_session
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+from api.db.database import get_session
 from api.models import User, Entry  
-from api.core.security import get_current_user 
+from api.dependencies.auth import get_current_user
+from api.schemas.entry import Stats
+from api.schemas.erreur import reponses
 
 
 router = APIRouter(tags=["Statistiques & Profil"])
 
-@router.get("/me/stats")
-def get_user_stats(
+@router.get(
+    "/me/stats",
+    response_model=Stats,
+    summary="Statistiques de ma collection",
+    responses=reponses(401),
+)
+async def get_user_stats(
     current_user: User = Depends(get_current_user),
-    session: Session = Depends(get_session)
-):
+    session: AsyncSession = Depends(get_session)
+) -> dict:
     
     statement = select(Entry).where(Entry.user_id == current_user.id)
-    entries = session.exec(statement).all()
+    entries = (await session.exec(statement)).all()
 
     
     total = len(entries)
 
     
-    par_statut = {}
+    # les 3 statuts sont toujours présents, même à 0
+    par_statut = {"a_decouvrir": 0, "en_cours": 0, "termine": 0}
     for entry in entries:
         statut = entry.statut
         if statut in par_statut:
@@ -41,4 +50,4 @@ def get_user_stats(
         "total": total,
         "par_statut": par_statut,
         "note_moyenne": note_moyenne
-    }
+    }

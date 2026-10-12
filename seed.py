@@ -1,34 +1,35 @@
-from sqlmodel import Session, select
-from api.database import engine 
-from api.models import Item      
+import asyncio
 
-def seed_catalog():
-    categories = ["Entrées", "Plats", "Desserts", "Boissons"]
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+from api.db.database import creer_tables, engine
+from api.db.recettes import RECETTES
+from api.models import Item
 
-    items_to_create = []
-    for i in range(1, 41):
-        category = categories[(i - 1) % len(categories)]
-        
-        item = Item(
-            name=f"Recette n°{i}",
-            category=category,
-            description=f"Description de la recette numéro {i}."
-        )
-        items_to_create.append(item)
+async def seed_catalog() -> None:
+    await creer_tables()
 
-    with Session(engine) as session:
-        statement = select(Item)
-        existing_items = session.exec(statement).all()
-        
-        if len(existing_items) > 0:
-            print("Le catalogue contient déjà des éléments.")
-            return
+    ajoutees = 0
+    mises_a_jour = 0
 
-        for item in items_to_create:
-            session.add(item)
-        
-        session.commit()
-        print("C'est OK ! 40 éléments répartis sur 4 catégories ont été injectés dans la base de données.")
+    async with AsyncSession(engine) as session:
+        for recette in RECETTES:
+            # on cherche la recette par son titre pour ne jamais créer de doublon
+            statement = select(Item).where(Item.titre == recette["titre"])
+            item = (await session.exec(statement)).first()
+
+            if item is None:
+                session.add(Item(**recette))
+                ajoutees += 1
+            else:
+                # la recette existe déjà : on met à jour ses infos (image, temps...)
+                for champ, valeur in recette.items():
+                    setattr(item, champ, valeur)
+                session.add(item)
+                mises_a_jour += 1
+
+        await session.commit()
+        print(f"C'est OK ! {ajoutees} recette(s) ajoutée(s), {mises_a_jour} mise(s) à jour.")
 
 if __name__ == "__main__":
-    seed_catalog()
+    asyncio.run(seed_catalog())

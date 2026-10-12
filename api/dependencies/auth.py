@@ -1,36 +1,40 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlmodel import Session, select
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 import jwt
 
-from api.database import get_session 
+from api.db.database import get_session
 from api.models import User           
 from api.core.security import SECRET_KEY, ALGORITHM
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+bearer_scheme = HTTPBearer(auto_error=False)
 
-def get_current_user(
-    token: str = Depends(oauth2_scheme), 
-    session: Session = Depends(get_session)
-):
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    session: AsyncSession = Depends(get_session)
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Impossible de valider les identifiants",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
+    if credentials is None:
+        raise credentials_exception
+
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str | None = payload.get("sub")
+        if email is None:
             raise credentials_exception
     except jwt.PyJWTError:
         raise credentials_exception
         
-    statement = select(User).where(User.username == username)
-    user = session.exec(statement).first()
+    statement = select(User).where(User.email == email)
+    user = (await session.exec(statement)).first()
     
     if user is None:
         raise credentials_exception
         
-    return user
+    return user
